@@ -7,7 +7,7 @@ R code for *"Real-world cardiovascular effects of liraglutide: transportability 
 of the LEADER trial"* (under review;
 [preprint on medRxiv](https://www.medrxiv.org/content/10.1101/2025.05.12.25327466v3)).
 Two parts: an **applied analysis** (LEADER → VA cohorts A–E) and a **simulation study**.
-Individual-level data are **not** included (see [Data](#data)).
+Individual-level data are **not** included.
 
 ## Method
 
@@ -39,12 +39,11 @@ Transporting to the VA target generally widens the estimated benefit relative to
 ```
 leader-transport/
 ├── transport_helpers.R          # AIPW estimator: temp(), temp_m(), make_samp()
-├── Trans_LEADER_primary_v2.R    # primary analysis, cohorts A–E  -> Results/Primary/
-├── Trans_LEADER_sensitivity.R   # sensitivity analyses (cohort A) -> Results/Sensitivity/
-├── make_figures.R               # applied figures, Results/ -> Figures/
+├── Trans_LEADER_primary_v2.R    # primary analysis, cohorts A–E
+├── Trans_LEADER_sensitivity.R   # sensitivity analyses (cohort A)
+├── make_figures.R               # applied figures
 ├── Simulation/                  # 01_dgp.R, 02_estimators.R, 03_run_simulation.R
-├── Results/                     # Primary/ and Sensitivity/ outputs
-└── Figures/                     # manuscript figures (PNG/TIFF)
+└── Figures/                     # manuscript figures
 ```
 
 VA cohorts A–E nest: A (A1C ≥ 7%, age ≥ 50, cardiac disease or CKD 3–4), then drop the A1C
