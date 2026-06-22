@@ -1,10 +1,11 @@
 ####-----------------------------------------------------------------------------
 ## Shared helpers for the LEADER transportability analysis.
 ##
-##   temp()        AIPW transport estimator; cross-fit outcome regression
-##   temp_m()      multi-outcome wrapper (composite, MI, stroke, death)
-##   make_samp()   align trial-side weights to the (target, trial) row order
-##                 expected by temp_m() and temp()
+##   temp()         AIPW transport estimator; cross-fit outcome regression
+##   temp_m()       multi-outcome wrapper (composite, MI, stroke, death)
+##   temp_binary()  cross-fit AIPW for a single binary outcome (adverse events)
+##   make_samp()    align trial-side weights to the (target, trial) row order
+##                  expected by temp_m(), temp(), and temp_binary()
 ##
 ####-----------------------------------------------------------------------------
 
@@ -161,4 +162,97 @@ temp_m <- function(LD_data1, cohort, cohort_name, cuts, vars, samp, K = 5L,
 make_samp <- function(cohort_df, trial_df, trial_wts_by_subjid) {
   w_trial <- trial_wts_by_subjid[match(trial_df$SUBJID, names(trial_wts_by_subjid))]
   c(rep(1, nrow(cohort_df)), w_trial)
+}
+
+temp_binary <- function(S, X, Z1, Y1, evt_name, samp, K = 5L,
+                        sl.lib = c("SL.mean", "SL.glmnet", "SL.earth",
+                                   "SL.gam", "SL.ranger")) {
+
+  Y1 <- as.numeric(Y1)
+  n <- nrow(X)
+  n0 <- sum(S == 0)
+  n1 <- sum(S == 1)
+  idx_S1 <- which(S == 1)
+  idx_S0 <- which(S == 0)
+  X1 <- X[idx_S1, , drop = FALSE]
+  X0 <- X[idx_S0, , drop = FALSE]
+
+  fold_id <- integer(n1)
+  for (z_val in c(0, 1)) {
+    z_idx <- which(Z1 == z_val)
+    fold_id[z_idx] <- sample(rep(seq_len(K), length.out = length(z_idx)))
+  }
+
+  mu0_S1 <- numeric(n1)
+  mu1_S1 <- numeric(n1)
+  mu0_S0_mat <- matrix(0, n0, K)
+  mu1_S0_mat <- matrix(0, n0, K)
+
+  for (k in seq_len(K)) {
+
+    if (K == 1L) {
+      tr <- te <- seq_len(n1)
+    } else {
+      tr <- which(fold_id != k)
+      te <- which(fold_id == k)
+    }
+
+    fit_k <- SuperLearner(Y = Y1[tr],
+                          X = data.frame(X1[tr, , drop = FALSE], Z = Z1[tr]),
+                          SL.library = sl.lib, family = binomial())
+
+    mu0_S1[te] <- predict(fit_k, newdata = data.frame(X1[te, , drop = FALSE], Z = 0))$pred
+    mu1_S1[te] <- predict(fit_k, newdata = data.frame(X1[te, , drop = FALSE], Z = 1))$pred
+    mu0_S0_mat[, k] <- predict(fit_k, newdata = data.frame(X0, Z = 0))$pred
+    mu1_S0_mat[, k] <- predict(fit_k, newdata = data.frame(X0, Z = 1))$pred
+
+  }
+
+  mu0_S0 <- rowMeans(mu0_S0_mat)
+  mu1_S0 <- rowMeans(mu1_S0_mat)
+
+  psi <- numeric(n)
+  psi[idx_S1] <- Y1
+  Z <- numeric(n)
+  Z[idx_S1] <- Z1
+
+  mu_obs <- numeric(n)
+  mu_obs[idx_S1] <- Z1 * mu1_S1 + (1 - Z1) * mu0_S1
+  mu_0 <- numeric(n)
+  mu_0[idx_S1] <- mu0_S1
+  mu_0[idx_S0] <- mu0_S0
+  mu_1 <- numeric(n)
+  mu_1[idx_S1] <- mu1_S1
+  mu_1[idx_S0] <- mu1_S0
+
+  w0 <- (1 - Z) * S * samp / mean(1 - Z1)
+  w1 <- Z * S * samp / mean(Z1)
+
+  theta0 <- sum(S * w0 * (psi - mu_obs)) / n1 + mean(mu_0[idx_S0])
+  theta0_eic <- (S * w0 * (psi - mu_obs)) / mean(S == 1) +
+    ((S == 0) * mu_0) / mean(S == 0) - theta0
+
+  theta1 <- sum(S * w1 * (psi - mu_obs)) / n1 + mean(mu_1[idx_S0])
+  theta1_eic <- (S * w1 * (psi - mu_obs)) / mean(S == 1) +
+    ((S == 0) * mu_1) / mean(S == 0) - theta1
+
+  tau <- sum(S * (w1 - w0) * (psi - mu_obs)) / n1 + mean(mu_1[idx_S0] - mu_0[idx_S0])
+  tau_eic <- (S * (w1 - w0) * (psi - mu_obs)) / mean(S == 1) +
+    ((S == 0) * (mu_1 - mu_0)) / mean(S == 0) - tau
+
+  rbind(
+    data.frame(value = "ATE", estimate = tau, variance = var(tau_eic) / n,
+               lower = tau - 1.96 * sqrt(var(tau_eic) / n),
+               upper = tau + 1.96 * sqrt(var(tau_eic) / n),
+               evt_name = evt_name),
+    data.frame(value = "EY0", estimate = theta0, variance = var(theta0_eic) / n,
+               lower = theta0 - 1.96 * sqrt(var(theta0_eic) / n),
+               upper = theta0 + 1.96 * sqrt(var(theta0_eic) / n),
+               evt_name = evt_name),
+    data.frame(value = "EY1", estimate = theta1, variance = var(theta1_eic) / n,
+               lower = theta1 - 1.96 * sqrt(var(theta1_eic) / n),
+               upper = theta1 + 1.96 * sqrt(var(theta1_eic) / n),
+               evt_name = evt_name)
+  )
+
 }

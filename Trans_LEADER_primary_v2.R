@@ -3,9 +3,9 @@
 ##
 ## Cohort definitions:
 ##   A: A1C >= 7 AND age >= 50 AND (cardiac_disease | CKD stage 3-4)
-##   B: drop CVD/CKD requirement
+##   B: drop A1C requirement
 ##   C: drop age requirement
-##   D: drop A1C requirement
+##   D: drop CVD/CKD requirement
 ##   E: drop all inclusion criteria
 ####-----------------------------------------------------------------------------
 
@@ -38,9 +38,9 @@ load(file = "P:/ORD_Raghavan_201905055d/Grace/transportability/data/data1_gen.rd
 data2_gen <- data1_gen[smoker != "", ]
 
 cohort_a <- data2_gen[A1C >= 7 & age >= 50 & (cardiac_disease == 1 | CKD %in% c("stage 3", "stage 4")), ]
-cohort_b <- data2_gen[A1C >= 7 & age >= 50, ]
+cohort_b <- data2_gen[age >= 50 & (cardiac_disease == 1 | CKD %in% c("stage 3", "stage 4")), ]
 cohort_c <- data2_gen[A1C >= 7 & (cardiac_disease == 1 | CKD %in% c("stage 3", "stage 4")), ]
-cohort_d <- data2_gen[age >= 50 & (cardiac_disease == 1 | CKD %in% c("stage 3", "stage 4")), ]
+cohort_d <- data2_gen[A1C >= 7 & age >= 50, ]
 cohort_e <- data2_gen
 
 load(file = "P:/ORD_Raghavan_201905055d/Grace/transportability/data/data1_LD.rda")

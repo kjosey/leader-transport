@@ -7,12 +7,12 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 
-out_dir <- file.path("~", "Documents", "LEADER", "Simulation")
+out_dir <- file.path("~", "Documents", "LEADER")
 out_dir <- normalizePath(out_dir, mustWork = FALSE)
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
-source(file.path(out_dir, "01_dgp.R"))
-source(file.path(out_dir, "02_estimators.R"))
+source(file.path(out_dir, "Simulation/01_dgp.R"))
+source(file.path(out_dir, "Simulation/02_estimators.R"))
 
 scenarios <- c("baseline",
                "omitted_selection",
@@ -118,7 +118,7 @@ results_long <- final_results %>%
   mutate(metric = case_when(metric == "bias" ~ "Bias",
                             metric == "coverage" ~ "Coverage Probability"))
 
-write_csv(results_long, file.path(out_dir, "simulation_table.csv"))
+write_csv(results_long, file.path(out_dir, "Results/simulation_table.csv"))
 
 ref_lines <- data.frame(metric = c("Bias", "Coverage Probability"),
                         hline = c(0, 0.95))
@@ -146,9 +146,8 @@ faceted_plot <- ggplot(results_long, aes(x = time, y = value, color = scenario, 
         strip.text = element_text(size = 19, face = "bold")) +
   guides(color = guide_legend(nrow = 2, override.aes = list(linewidth = 1.6, size = 4)))
 
-ggsave(file.path(out_dir, "simulation.png"), faceted_plot,
-       width = 13, height = 7.5, dpi = 300)
-
+ggsave(file.path(out_dir, "Figures/Figure1.png"), faceted_plot, width = 14, height = 8, dpi = 300)
+ggsave(file.path(out_dir, "Figures/Figure1.tiff"), faceted_plot, width = 14, height = 8, dpi = 300,  compression = "lzw")
 
 ###=============================================================================
 ### Weight-density panel (Reviewer 2 major comment 4)
@@ -181,5 +180,5 @@ weight_plot <- ggplot(subset(weights_long, w > 0),
   theme_bw(base_size = 12) +
   theme(strip.text = element_text(size = 10, face = "bold"))
 
-ggsave(file.path(out_dir, "simulation_weight_distribution.png"), 
+ggsave(file.path(out_dir, "Figures/simulation_weight_distribution.png"), 
        weight_plot, width = 12, height = 5, dpi = 300)
