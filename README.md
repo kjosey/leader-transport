@@ -39,7 +39,7 @@ Transporting to the VA target generally widens the estimated benefit relative to
 ```
 leader-transport/
 ├── transport_helpers.R          # AIPW estimator: temp(), temp_m(), make_samp()
-├── Trans_LEADER_primary_.R    # primary analysis, cohorts A–E
+├── Trans_LEADER_primary.R       # primary analysis, cohorts A–E
 ├── Trans_LEADER_sensitivity.R   # sensitivity analyses (cohort A)
 ├── make_figures.R               # applied figures
 ├── Simulation/                  # 01_dgp.R, 02_estimators.R, 03_run_simulation.R
