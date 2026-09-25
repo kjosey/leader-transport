@@ -139,8 +139,7 @@ surv$evt_name <- factor(surv$evt_name, levels = outcome_levels)
 
 ## Risk difference for Cohort A: LEADER vs VA-weighted LEADER (reuse `rd`).
 rd2 <- rd[rd$cohort %in% c("LEADER", "VA A"), ]
-rd2$source <- factor(ifelse(rd2$cohort == "LEADER", src_leader, src_target),
-                     levels = src_levels)
+rd2$source <- factor(ifelse(rd2$cohort == "LEADER", src_leader, src_target), levels = src_levels)
 
 surv_panel <- function(evt) {
   d <- surv[surv$evt_name == evt, ]
@@ -174,11 +173,14 @@ rd2_panel <- function(evt) {
 }
 
 fig2_list <- list()
+
 for (evt in outcome_levels) {
   fig2_list[[length(fig2_list) + 1]] <- surv_panel(evt)
   fig2_list[[length(fig2_list) + 1]] <- rd2_panel(evt)
 }
+
 fig2 <- plot_grid(plotlist = fig2_list, ncol = 2)
+
 ggsave(file.path(fig_dir, "Figure2.png"), fig2, width = 12, height = 14, dpi = 300)
 ggsave(file.path(fig_dir, "Figure2.tiff"), fig2, width = 12, height = 14,
        dpi = 300, compression = "lzw")
@@ -189,6 +191,7 @@ ggsave(file.path(fig_dir, "Figure2.tiff"), fig2, width = 12, height = 14,
 
 crit6 <- c("High ASCVD Risk", "Age >= 50", "A1c >= 7%", "eGFR > 15",
            "Oral med and/or long-acting insulin", "Type 2 diabetes")
+
 req6 <- list(
   "LEADER" = c(TRUE, TRUE, TRUE, FALSE, TRUE, TRUE),
   "VA A" = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE),
@@ -197,6 +200,7 @@ req6 <- list(
   "VA D" = c(FALSE, TRUE, TRUE, TRUE, TRUE, TRUE),
   "VA E" = c(FALSE, FALSE, FALSE, TRUE, TRUE, TRUE)
 )
+
 fig4a <- upset_panel(crit6, req6,
                      c("LEADER", "VA A", "VA B", "VA C", "VA D", "VA E"))
 
@@ -216,9 +220,8 @@ panel_rd <- function(evt) {
 }
 
 fig4b <- plot_grid(plotlist = lapply(outcome_levels, panel_rd), ncol = 2)
+fig4 <- plot_grid(fig4a, fig4b, ncol = 1, rel_heights = c(1, 2.2), labels = c("A", "B"))
 
-fig4 <- plot_grid(fig4a, fig4b, ncol = 1, rel_heights = c(1, 2.2),
-                  labels = c("A", "B"))
 ggsave(file.path(fig_dir, "Figure4.png"), fig4, width = 9, height = 11, dpi = 300)
 ggsave(file.path(fig_dir, "Figure4.tiff"), fig4, width = 9, height = 11,
        dpi = 300, compression = "lzw")
@@ -228,6 +231,7 @@ ggsave(file.path(fig_dir, "Figure4.tiff"), fig4, width = 9, height = 11,
 ####=============================================================================
 
 ess_of <- function(path) read.csv(path, stringsAsFactors = FALSE)$ess
+
 ess <- data.frame(
   cohort = factor(c("LEADER", "A", "B", "C", "D", "E"),
                   levels = c("LEADER", "A", "B", "C", "D", "E")),
@@ -251,6 +255,7 @@ p_ess <- ggplot(ess, aes(cohort, ess)) +
         axis.text.x = element_blank())
 
 crit3 <- c("High ASCVD Risk", "Age >= 50", "A1c >= 7%")
+
 req3 <- list(
   "LEADER" = c(TRUE, TRUE, TRUE),
   "A" = c(TRUE, TRUE, TRUE),
@@ -259,10 +264,11 @@ req3 <- list(
   "D" = c(FALSE, TRUE, TRUE),
   "E" = c(FALSE, FALSE, FALSE)
 )
+
 p_mat <- upset_panel(crit3, req3, c("LEADER", "A", "B", "C", "D", "E"))
 
-efig4 <- plot_grid(p_ess, p_mat, ncol = 1, align = "v", axis = "lr",
-                   rel_heights = c(2, 1.4))
+efig4 <- plot_grid(p_ess, p_mat, ncol = 1, align = "v", axis = "lr", rel_heights = c(2, 1.4))
+
 ggsave(file.path(fig_dir, "eFigure4.png"), efig4, width = 7, height = 8, dpi = 300)
 ggsave(file.path(fig_dir, "eFigure4.tiff"), efig4, width = 7, height = 8, dpi = 300, compression = "lzw")
 
@@ -320,11 +326,13 @@ efig_grid <- function(dat, levels, cols, file) {
 
 sex_recode <- c("cohort_a men" = "Men",
                 "cohort_a women (exploratory)" = "Women (exploratory)")
+
 sex_dat <- rbind(
   leader_ref,
   read_ate_series(file.path(t5a, "LD_trans_cohortA_sex_stratified.csv"),
                   by_cohort = TRUE, recode = sex_recode)
 )
+
 sex_levels <- c("LEADER", "Men", "Women (exploratory)")
 sex_cols <- c("LEADER" = "#3B4252", "Men" = "#2C7FB8",
               "Women (exploratory)" = "#E0A11A")
@@ -341,6 +349,7 @@ ho_dat <- rbind(
   read_ate_series(file.path(t5a, "LD_trans_rmst_rslt_cohortA_higher_order.csv"),
                   "Higher-order balance")
 )
+
 ho_levels <- c("LEADER", "First-moment balance", "Higher-order balance")
 ho_cols <- c("LEADER" = "#3B4252", "First-moment balance" = "#2C7FB8",
              "Higher-order balance" = "#E0A11A")
