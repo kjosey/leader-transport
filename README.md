@@ -5,7 +5,7 @@ Doubly-robust **transportability** of the cardiovascular effect of liraglutide f
 
 R code for *"Real-world cardiovascular effects of liraglutide: transportability analysis
 of the LEADER trial"* (under review;
-[preprint on medRxiv](https://www.medrxiv.org/content/10.1101/2025.05.12.25327466v3)).
+[preprint on medRxiv](https://www.medrxiv.org/content/10.1101/2025.05.12.25327466v4)).
 Two parts: an **applied analysis** (LEADER → VA cohorts A–E) and a **simulation study**.
 Individual-level data are **not** included.
 

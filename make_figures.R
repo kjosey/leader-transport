@@ -1,11 +1,6 @@
 ####-----------------------------------------------------------------------------
 ## Final manuscript figures for the LEADER transportability analysis.
 ##
-## One script for all three cross-population figures, each a faithful re-creation
-## of the originally submitted layout (NOT the simplified make_figures.R version),
-## regenerated from the FINAL tolerance-0.05 estimates incl. the now-estimable
-## Cohort D:
-##
 ##   Figure 2  : per outcome, transported survival curves (LEADER vs VA-weighted
 ##               LEADER, liraglutide vs placebo) beside the risk difference in
 ##               event-free survival over follow-up; four outcomes stacked (4x2).
@@ -19,12 +14,6 @@
 ##   eFigure 3 : higher-order/interaction vs first-moment balancing, transported
 ##               risk differences over follow-up (Cohort A).
 ##
-## Sources (final-data folders):
-##   LEADER trial survival by arm ... Results/Trial_Results/LEADER_sp_results_by_arm.csv
-##   LEADER trial RD series ......... Results/Trial_Results/LEADER_spdiff_results.csv
-##   transported cohort A ........... Results/Tolerance_5_cohortA/
-##   transported cohorts B-E ........ Results/Tolerance_5_cohortB_to_cohortE/
-##   weight diagnostics (ESS) ....... the same Tolerance_5 folders
 ####-----------------------------------------------------------------------------
 
 library(ggplot2)

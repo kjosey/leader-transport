@@ -8,8 +8,6 @@
 ##   4. Acute gallstone disease — composite, cholecystitis acute, cholelithiasis
 ##   5. Cancer leading to discontinuation
 ##
-## Estimator: cross-fit AIPW on a single binary outcome (temp_binary()), using
-## the same balancing weights and covariate set as the primary analysis.
 ####-----------------------------------------------------------------------------
 
 library(data.table)
